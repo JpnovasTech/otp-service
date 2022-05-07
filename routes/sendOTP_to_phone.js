@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const {OTP} = require('../sequelize');
+const {client} = require('../redisClient');
 const router = require("express").Router();
 const {encode} = require("../middlewares/crypt")
 var otpGenerator = require('otp-generator');
@@ -71,10 +71,6 @@ const crypto = require('crypto');
  *                  type: string
  */
 
-// To add minutes to the current time
-function AddMinutesToDate(date, minutes) {
-  return new Date(date.getTime() + minutes*60000);
-}
 
 
 router.post('/phone/otp', async (req, res, next) => {
@@ -101,27 +97,20 @@ router.post('/phone/otp', async (req, res, next) => {
 
     //Generate OTP 
     const otp = otpGenerator.generate(6, { alphabets: false, upperCase: false, specialChars: false });
-    const now = new Date();
-    const expiration_time = AddMinutesToDate(now,10);
-    
-    
-    //Create OTP instance in DB
-    const otp_instance = await OTP.create({
-      otp: otp,
-      expiration_time: expiration_time
-    });
+    const now = new Date();    
   
     // Create details object containing the phone number and otp id
     var details={
       "timestamp": now, 
       "check": phone_number,
       "success": true,
-      "message":"OTP sent to user",
-      "otp_id": otp_instance.id
+      "message":"OTP sent to user"
     }
     
     // Encrypt the details object
     const encoded= await encode(JSON.stringify(details))
+
+    client.setEx(encoded,300,otp);
     
     //Choose message template according type requested
     if(type){

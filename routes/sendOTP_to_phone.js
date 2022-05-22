@@ -110,7 +110,7 @@ router.post('/phone/otp', async (req, res, next) => {
     // Encrypt the details object
     const encoded= await encode(JSON.stringify(details))
 
-    client.setEx(encoded,300,otp);
+    client.set(encoded, otp, "EX", 300);
     
     //Choose message template according type requested
     if(type){

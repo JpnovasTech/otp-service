@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "helmet": "^3.23.0",
+    "ioredis": "^5.0.5",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "node-redis": "^0.1.7",

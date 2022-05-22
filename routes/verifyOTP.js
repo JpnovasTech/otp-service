@@ -109,7 +109,7 @@ router.post('/verify/otp', async (req, res, next) => {
               //Check if OTP is equal to the OTP in the DB
               if(otp===otp_instance){
                   client.del(verification_key);
-                  client.setEx(check,86400,verification_key);
+                  client.set(check,verification_key,"EX", 86400);
                   const response={"Status":"Success", "Details":"OTP Matched", "verification_key": verification_key}
                   return res.status(200).send(response)
               }
